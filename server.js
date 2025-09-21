@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
@@ -164,8 +164,13 @@ app.post('/test-config', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`SMTP Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log('Make sure to configure your .env file with SMTP credentials');
+  console.log('Environment variables loaded:', {
+    SMTP_HOST: process.env.SMTP_HOST ? 'Set' : 'Not set',
+    SMTP_USER: process.env.SMTP_USER ? 'Set' : 'Not set',
+    SMTP_PASS: process.env.SMTP_PASS ? 'Set' : 'Not set'
+  });
 });
