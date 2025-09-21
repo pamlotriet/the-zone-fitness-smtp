@@ -75,102 +75,11 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
-// Send bulk emails endpoint
-app.post('/send-bulk', async (req, res) => {
-  try {
-    const { emails, subject, text, html, from } = req.body;
 
-    if (!emails || !Array.isArray(emails) || emails.length === 0) {
-      return res.status(400).json({
-        error: 'emails array is required and must not be empty'
-      });
-    }
-
-    if (!subject || (!text && !html)) {
-      return res.status(400).json({
-        error: 'subject and text/html are required'
-      });
-    }
-
-    // Create transporter if not exists
-    if (!transporter) {
-      transporter = createTransporter();
-    }
-
-    const results = [];
-
-    for (const email of emails) {
-      try {
-        const mailOptions = {
-          from: from || process.env.SMTP_FROM || process.env.SMTP_USER,
-          to: email,
-          subject: subject,
-          text: text,
-          html: html
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        results.push({
-          email: email,
-          success: true,
-          messageId: info.messageId
-        });
-      } catch (error) {
-        results.push({
-          email: email,
-          success: false,
-          error: error.message
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: 'Bulk email processing completed',
-      results: results
-    });
-
-  } catch (error) {
-    console.error('Error sending bulk emails:', error);
-    res.status(500).json({
-      error: 'Failed to send bulk emails',
-      details: error.message
-    });
-  }
-});
-
-// Test email configuration endpoint
-app.post('/test-config', async (req, res) => {
-  try {
-    if (!transporter) {
-      transporter = createTransporter();
-    }
-
-    // Verify connection configuration
-    await transporter.verify();
-
-    res.json({
-      success: true,
-      message: 'SMTP configuration is valid and ready to send emails'
-    });
-
-  } catch (error) {
-    console.error('SMTP configuration error:', error);
-    res.status(500).json({
-      error: 'SMTP configuration is invalid',
-      details: error.message
-    });
-  }
-});
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`SMTP Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log('Make sure to configure your .env file with SMTP credentials');
-  console.log('Environment variables loaded:', {
-    SMTP_HOST: process.env.SMTP_HOST ? 'Set' : 'Not set',
-    SMTP_USER: process.env.SMTP_USER ? 'Set' : 'Not set',
-    SMTP_PASS: process.env.SMTP_PASS ? 'Set' : 'Not set'
-  });
 });
