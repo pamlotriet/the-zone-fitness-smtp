@@ -15,10 +15,11 @@ let transporter;
 
 // Initialize transporter based on environment variables
 function createTransporter() {
+  const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true for 465, false for other ports
+    host: process.env.SMTP_HOST || 's1.ahmail.co.za',
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465 (SSL), false for 587 (TLS)
     auth: {
       user: process.env.SMTP_USER, // your email
       pass: process.env.SMTP_PASS  // your email password or app password
