@@ -58,6 +58,11 @@ app.post('/send-email', async (req, res) => {
       html: html
     };
 
+    // Add default BCC if configured
+    if (process.env.SMTP_DEFAULT_BCC) {
+      mailOptions.bcc = process.env.SMTP_DEFAULT_BCC;
+    }
+
     // Send email
     const info = await transporter.sendMail(mailOptions);
 
